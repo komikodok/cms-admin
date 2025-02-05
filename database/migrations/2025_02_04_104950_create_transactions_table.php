@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('tenant_id')->constrained(table: 'tenants');
+            $table->foreignId('room_id')->constrained(table: 'rooms');
+            $table->timestamp('start_date');
+            $table->timestamp('end_date');
+            $table->enum('status', ['pending', 'confirmed', 'canceled'])->default('pending');
+            $table->uuid('token')->nullable();
             $table->timestamps();
         });
     }

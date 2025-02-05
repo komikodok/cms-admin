@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('whatsapp_notifications', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('tenant_id')->constrained(table: 'tenants');
+            $table->string('message')->nullable();
+            $table->enum('status', ['sended', 'failed'])->nullable()->default(null);
             $table->timestamps();
         });
     }
