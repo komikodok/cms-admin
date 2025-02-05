@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Room;
 use App\Models\Tenant;
 use App\Models\Payment;
 use Illuminate\Database\Eloquent\Model;
@@ -23,5 +24,10 @@ class Transaction extends Model
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function room(): BelongsTo
+    {
+        return $this->belongsTo(Room::class);
     }
 }
