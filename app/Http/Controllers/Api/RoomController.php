@@ -2,25 +2,25 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Models\Tenant;
+use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 
-class TenantController extends Controller
+class RoomController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $tenants = Tenant::all();
+        $rooms = Room::all();
 
         return response()->json([
             'status' => 'ok',
-            'message' => 'Successfully fetched tenants',
-            'data' => $tenants
+            'message' => 'Successfully fetched rooms',
+            'data' => $rooms
         ], Response::HTTP_OK);
     }
 
@@ -30,33 +30,33 @@ class TenantController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make(data: $request->all(), rules: [
-            'name' => 'required|string',
-            'email' => 'required|string|email:rfc,dns',
-            'phone_number' => 'required|integer'
+            'room_number' => 'required|string|unique:rooms,room_number',
+            'status' => 'required|string|in:available,occupied',
+            'price' => 'required|string'
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'errors',
-                'message' => 'Failed creating a new tenant data',
+                'message' => 'Failed creating a new room',
                 'errors' => $validator->errors()
             ], Response::HTTP_NOT_ACCEPTABLE);
         }
 
         try {
-            $createdTenant = Tenant::create($validator->validated());            
+            $createdRoom = Room::create($validator->validated());            
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'errors',
-                'message' => 'Failed creating a new tenant data',
+                'message' => 'Failed creating a new room',
                 'errors' => $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Successfully creating a new tenant data',
-            'data' => $createdTenant
+            'message' => 'Successfully creating a new tenant',
+            'data' => $createdRoom
         ], Response::HTTP_CREATED);
     }
 
@@ -65,12 +65,12 @@ class TenantController extends Controller
      */
     public function show(string $id)
     {
-        $tenant = Tenant::where('id', $id)->firstOrFail();
+        $room = Room::where('id', $id)->firstOrFail();
 
         return response()->json([
             'status' => 'ok',
-            'message' => 'Successfully fetched a tenant data',
-            'data' => $tenant
+            'message' => 'Successfully fetched a room data',
+            'data' => $room
         ]);
     }
 
@@ -80,35 +80,35 @@ class TenantController extends Controller
     public function update(Request $request, string $id)
     {
         $validator = Validator::make(data: $request->all(), rules: [
-            'name' => 'required|string',
-            'email' => 'required|string|email:rfc,dns',
-            'phone_number' => 'required|integer'
+            'room_number' => 'required|string|unique:rooms,room_number',
+            'status' => 'required|string|in:available,occupied',
+            'price' => 'required|string'
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'errors',
-                'message' => 'Failed updating a tenant data',
+                'message' => 'Failed creating a new room',
                 'errors' => $validator->errors()
             ], Response::HTTP_NOT_ACCEPTABLE);
         }
 
         try {
-            $tenant = Tenant::where('id', $id)->firstOrFail();
-            $updatedTenant = $tenant->update($validator->validated());
+            $room = Room::where('id', $id)->firstOrFail();            
+            $updatedRoom = $room->update($validator->validated());
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'errors',
-                'message' => 'Failed updating a tenant data',
+                'message' => 'Failed updating a new room',
                 'errors' => $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return response()->json([
-            'status' => 'ok',
-            'message' => 'Successfully updating a tenant data',
-            'data' => $updatedTenant
-        ], Response::HTTP_OK);
+            'status' => 'success',
+            'message' => 'Successfully updating a new tenant',
+            'data' => $updatedRoom
+        ], Response::HTTP_CREATED);
     }
 
     /**
@@ -116,13 +116,6 @@ class TenantController extends Controller
      */
     public function destroy(string $id)
     {
-        $tenant = Tenant::where('id', $id)->firstOrFail();
-        $tenant->delete();
-
-        return response()->json([
-            'status' => 'ok',
-            'message' => 'Successfully deleting a tenant data',
-            'data' => $tenant
-        ]);
+        //
     }
 }

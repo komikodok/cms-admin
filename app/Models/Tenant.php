@@ -4,8 +4,8 @@ namespace App\Models;
 
 use App\Models\Transaction;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Tenant extends Model
 {
@@ -13,8 +13,8 @@ class Tenant extends Model
 
     protected $guarded = [];
 
-    public function transactions(): HasMany
+    public function transactions(): HasOne
     {
-        return $this->hasMany(Transaction::class);
+        return $this->hasOne(Transaction::class);
     }
 }
