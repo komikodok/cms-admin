@@ -18,7 +18,7 @@ return new class extends Migration
             $table->timestamp('start_date');
             $table->timestamp('end_date');
             $table->enum('status', ['pending', 'confirmed', 'canceled'])->default('pending');
-            $table->uuid('token')->nullable();
+            $table->string('token')->nullable();
             $table->timestamps();
         });
     }

@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
 use App\Models\Transaction;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 
 class TransactionController extends Controller
@@ -32,7 +33,45 @@ class TransactionController extends Controller
         $validator = Validator::make($request->all(), [
             'tenant_id' => 'required|integer',
             'room_id' => 'required|integer',
+            'start_date' => 'required|date_format:Y-m-d H:i:s|after_or_equal:today',
+            'end_date' => 'required|date_format:Y-m-d H:i:s|after_or_equal:today',
+            'status' => 'required|string|in:pending,confirmed,canceled',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'errors',
+                'message' => 'Failed creating a new transaction',
+                'errors' => $validator->errors()
+            ], Response::HTTP_NOT_ACCEPTABLE);
+        }
+
+        do {
+            $token = Str::random(5);
+        } while (Transaction::where('token', $token)->exists());
+        
+        try {
+            $createdTransaction = Transaction::create([
+                'tenant_id' => $request->tenant_id,
+                'room_id' => $request->room_id,
+                'start_date' => $request->start_date,
+                'end_date' => $request->end_date,
+                'status' => $request->status,
+                'token' => $token,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'errors',
+                'message' => 'Failed creating a new transaction',
+                'errors' => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Successfully creating a new transaction',
+            'data' => $createdTransaction
+        ], Response::HTTP_CREATED);
     }
 
     /**
@@ -40,7 +79,13 @@ class TransactionController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $transactions = Transaction::where('id', $id)->firstOrFail();
+
+        return response()->json([
+            'status' => 'ok',
+            'message' => 'Successfully fetched a room data',
+            'data' => $transactions
+        ], Response::HTTP_OK);
     }
 
     /**
@@ -48,7 +93,38 @@ class TransactionController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'tenant_id' => 'required|integer|exists:tenants,id',
+            'room_id' => 'required|integer|exists:rooms,id',
+            'start_date' => 'required|date_format:Y-m-d H:i:s|after_or_equal:today',
+            'end_date' => 'required|date_format:Y-m-d H:i:s|after_or_equal:today',
+            'status' => 'required|string|in:pending,confirmed,canceled',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'errors',
+                'message' => 'Failed updating a new transaction',
+                'errors' => $validator->errors()
+            ], Response::HTTP_NOT_ACCEPTABLE);
+        }
+        
+        try {
+            $transaction = Transaction::where('id', $id)->firstOrFail;
+            $transaction->update($validator->validated());
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'errors',
+                'message' => 'Failed updating a new transaction',
+                'errors' => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        return response()->json([
+            'status' => 'ok',
+            'message' => 'Successfully updating a new transaction',
+            'data' => $transaction->fresh()
+        ], Response::HTTP_OK);
     }
 
     /**
@@ -56,6 +132,13 @@ class TransactionController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $transaction = Transaction::where('id', $id)->firstOrFail();
+        $transaction->delete();
+
+        return response()->json([
+            'status' => 'ok',
+            'message' => 'Successfully deleting a transaction data',
+            'data' => $transaction
+        ], Response::HTTP_OK);
     }
 }

@@ -95,7 +95,7 @@ class RoomController extends Controller
 
         try {
             $room = Room::where('id', $id)->firstOrFail();            
-            $updatedRoom = $room->update($validator->validated());
+            $room->update($validator->validated());
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'errors',
@@ -107,7 +107,7 @@ class RoomController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Successfully updating a new tenant',
-            'data' => $updatedRoom
+            'data' => $room->fresh()
         ], Response::HTTP_CREATED);
     }
 
@@ -116,6 +116,13 @@ class RoomController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $room = Room::where('id', $id)->firstOrFail();
+        $room->delete();
+
+        return response()->json([
+            'status' => 'ok',
+            'message' => 'Successfully deleting a room data',
+            'data' => $room
+        ], Response::HTTP_OK);
     }
 }

@@ -2,25 +2,25 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Models\Tenant;
+use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 
-class TenantController extends Controller
+class PaymentController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $tenants = Tenant::all();
+        $payments = Payment::all();
 
         return response()->json([
             'status' => 'ok',
-            'message' => 'Successfully fetched tenants',
-            'data' => $tenants
+            'message' => 'Successfully fetched a payments data',
+            'data' => $payments
         ], Response::HTTP_OK);
     }
 
@@ -29,34 +29,36 @@ class TenantController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make(data: $request->all(), rules: [
-            'name' => 'required|string',
-            'email' => 'required|string|email:rfc,dns',
-            'phone_number' => 'required|integer'
+        $validator = Validator::make($request->all(), [
+            'transaction_id' => 'required|integer|exists:transactions,id',
+            'payment_date' => 'required|date_format:Y-m-d H:i:s|after_or_equal:today',
+            'amount' => 'nullable|string',
+            'status' => 'required|string|in:pending,success,failed',
+            'payment_method' => 'required|string|in:transfer,cash'
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'errors',
-                'message' => 'Failed creating a new tenant data',
+                'message' => 'Failed creating a new payment data',
                 'errors' => $validator->errors()
             ], Response::HTTP_NOT_ACCEPTABLE);
         }
 
         try {
-            $createdTenant = Tenant::create($validator->validated());            
+            $createdPayment = Payment::create($validator->validated());
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'errors',
-                'message' => 'Failed creating a new tenant data',
+                'message' => 'Failed creating a new payment data',
                 'errors' => $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Successfully creating a new tenant data',
-            'data' => $createdTenant
+            'message' => 'Successfully creating a new payment',
+            'data' => $createdPayment
         ], Response::HTTP_CREATED);
     }
 
@@ -65,13 +67,13 @@ class TenantController extends Controller
      */
     public function show(string $id)
     {
-        $tenant = Tenant::where('id', $id)->firstOrFail();
+        $payment = Payment::where('id', $id)->firstOrFail();
 
         return response()->json([
             'status' => 'ok',
-            'message' => 'Successfully fetched a tenant data',
-            'data' => $tenant
-        ]);
+            'message' => 'Successfully fetched a payment data',
+            'data' => $payment
+        ], Response::HTTP_OK);
     }
 
     /**
@@ -79,35 +81,37 @@ class TenantController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $validator = Validator::make(data: $request->all(), rules: [
-            'name' => 'required|string',
-            'email' => 'required|string|email:rfc,dns',
-            'phone_number' => 'required|integer'
+        $validator = Validator::make($request->all(), [
+            'transaction_id' => 'required|integer|exists:transactions,id',
+            'payment_date' => 'required|date_format:Y-m-d H:i:s|after_or_equal:today',
+            'amount' => 'nullable|string',
+            'status' => 'required|string|in:pending,success,failed',
+            'payment_method' => 'required|string|in:transfer,cash'
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'errors',
-                'message' => 'Failed updating a tenant data',
+                'message' => 'Failed updating a payment data',
                 'errors' => $validator->errors()
             ], Response::HTTP_NOT_ACCEPTABLE);
         }
 
         try {
-            $tenant = Tenant::where('id', $id)->firstOrFail();
-            $tenant->update($validator->validated());
+            $payment = Payment::where('id', $id)->firstOrFail();
+            $payment->update($validator->validated());
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'errors',
-                'message' => 'Failed updating a tenant data',
+                'message' => 'Failed updating a payment data',
                 'errors' => $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return response()->json([
             'status' => 'ok',
-            'message' => 'Successfully updating a tenant data',
-            'data' => $tenant->fresh()
+            'message' => 'Successfully updating a payment data',
+            'data' => $payment->fresh()
         ], Response::HTTP_OK);
     }
 
@@ -116,13 +120,13 @@ class TenantController extends Controller
      */
     public function destroy(string $id)
     {
-        $tenant = Tenant::where('id', $id)->firstOrFail();
-        $tenant->delete();
+        $payment = Payment::where('id', $id)->firstOrFail();
+        $payment->delete();
 
         return response()->json([
             'status' => 'ok',
-            'message' => 'Successfully deleting a tenant data',
-            'data' => $tenant
+            'message' => 'Successfully deleting a payment data',
+            'data' => $payment
         ], Response::HTTP_OK);
     }
 }
