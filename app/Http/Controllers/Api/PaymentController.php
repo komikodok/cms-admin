@@ -19,7 +19,7 @@ class PaymentController extends Controller
 
         return response()->json([
             'status' => 'ok',
-            'message' => 'Successfully fetched a payments data',
+            'message' => 'Successfully fetched payments data.',
             'data' => $payments
         ], Response::HTTP_OK);
     }
@@ -40,9 +40,9 @@ class PaymentController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'errors',
-                'message' => 'Failed creating a new payment data',
+                'message' => 'Validation errors.',
                 'errors' => $validator->errors()
-            ], Response::HTTP_NOT_ACCEPTABLE);
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         try {
@@ -50,14 +50,14 @@ class PaymentController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'errors',
-                'message' => 'Failed creating a new payment data',
+                'message' => 'Failed to record payment data.',
                 'errors' => $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Successfully creating a new payment',
+            'message' => 'Payment data recorded successfully',
             'data' => $createdPayment
         ], Response::HTTP_CREATED);
     }
@@ -92,9 +92,9 @@ class PaymentController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'errors',
-                'message' => 'Failed updating a payment data',
+                'message' => 'Validation errors.',
                 'errors' => $validator->errors()
-            ], Response::HTTP_NOT_ACCEPTABLE);
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         try {
@@ -103,14 +103,14 @@ class PaymentController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'errors',
-                'message' => 'Failed updating a payment data',
+                'message' => 'Failed to update payment data.',
                 'errors' => $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return response()->json([
             'status' => 'ok',
-            'message' => 'Successfully updating a payment data',
+            'message' => 'Payment data updated successfully.',
             'data' => $payment->fresh()
         ], Response::HTTP_OK);
     }
@@ -125,8 +125,7 @@ class PaymentController extends Controller
 
         return response()->json([
             'status' => 'ok',
-            'message' => 'Successfully deleting a payment data',
-            'data' => $payment
+            'message' => 'Payment data deleted successfully',
         ], Response::HTTP_OK);
     }
 }

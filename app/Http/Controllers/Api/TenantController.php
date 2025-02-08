@@ -38,9 +38,9 @@ class TenantController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'errors',
-                'message' => 'Failed creating a new tenant data',
+                'message' => 'Validation errors.',
                 'errors' => $validator->errors()
-            ], Response::HTTP_NOT_ACCEPTABLE);
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         try {
@@ -48,14 +48,14 @@ class TenantController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'errors',
-                'message' => 'Failed creating a new tenant data',
+                'message' => 'Failed to create tenant data.',
                 'errors' => $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Successfully creating a new tenant data',
+            'message' => 'Tenant data created successfully.',
             'data' => $createdTenant
         ], Response::HTTP_CREATED);
     }
@@ -88,9 +88,9 @@ class TenantController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'errors',
-                'message' => 'Failed updating a tenant data',
+                'message' => 'Valdiation errors.',
                 'errors' => $validator->errors()
-            ], Response::HTTP_NOT_ACCEPTABLE);
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         try {
@@ -99,14 +99,14 @@ class TenantController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'errors',
-                'message' => 'Failed updating a tenant data',
+                'message' => 'Failed to update tenant data.',
                 'errors' => $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return response()->json([
             'status' => 'ok',
-            'message' => 'Successfully updating a tenant data',
+            'message' => 'Tenant data updated successfully',
             'data' => $tenant->fresh()
         ], Response::HTTP_OK);
     }
@@ -121,7 +121,7 @@ class TenantController extends Controller
 
         return response()->json([
             'status' => 'ok',
-            'message' => 'Successfully deleting a tenant data',
+            'message' => 'Tenant data deleted successfully data',
             'data' => $tenant
         ], Response::HTTP_OK);
     }

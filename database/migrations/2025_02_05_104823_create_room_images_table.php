@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('room_images', function (Blueprint $table) {
             $table->id();
             $table->foreignId('room_id')->constrained(table: 'rooms');
-            $table->string('image_path');
+            $table->string('image');
             $table->timestamps();
         });
     }

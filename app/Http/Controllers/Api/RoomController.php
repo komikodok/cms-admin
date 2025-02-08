@@ -19,7 +19,7 @@ class RoomController extends Controller
 
         return response()->json([
             'status' => 'ok',
-            'message' => 'Successfully fetched rooms',
+            'message' => 'Successfully fetched rooms data.',
             'data' => $rooms
         ], Response::HTTP_OK);
     }
@@ -38,9 +38,9 @@ class RoomController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'errors',
-                'message' => 'Failed creating a new room',
+                'message' => 'Validation errors.',
                 'errors' => $validator->errors()
-            ], Response::HTTP_NOT_ACCEPTABLE);
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         try {
@@ -48,14 +48,14 @@ class RoomController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'errors',
-                'message' => 'Failed creating a new room',
+                'message' => 'Failed to create room data.',
                 'errors' => $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Successfully creating a new tenant',
+            'message' => 'Room data created successfully.',
             'data' => $createdRoom
         ], Response::HTTP_CREATED);
     }
@@ -69,7 +69,7 @@ class RoomController extends Controller
 
         return response()->json([
             'status' => 'ok',
-            'message' => 'Successfully fetched a room data',
+            'message' => 'Successfully fetched a room data.',
             'data' => $room
         ]);
     }
@@ -88,9 +88,9 @@ class RoomController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'errors',
-                'message' => 'Failed creating a new room',
+                'message' => 'Validation errors.',
                 'errors' => $validator->errors()
-            ], Response::HTTP_NOT_ACCEPTABLE);
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         try {
@@ -99,14 +99,14 @@ class RoomController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'errors',
-                'message' => 'Failed updating a new room',
+                'message' => 'Failed to update room data.',
                 'errors' => $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Successfully updating a new tenant',
+            'message' => 'Room data updated successfully.',
             'data' => $room->fresh()
         ], Response::HTTP_CREATED);
     }
@@ -121,7 +121,7 @@ class RoomController extends Controller
 
         return response()->json([
             'status' => 'ok',
-            'message' => 'Successfully deleting a room data',
+            'message' => 'Payment data deleted successfully.',
             'data' => $room
         ], Response::HTTP_OK);
     }

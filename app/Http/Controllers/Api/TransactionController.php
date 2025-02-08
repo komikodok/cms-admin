@@ -43,7 +43,7 @@ class TransactionController extends Controller
                 'status' => 'errors',
                 'message' => 'Failed creating a new transaction',
                 'errors' => $validator->errors()
-            ], Response::HTTP_NOT_ACCEPTABLE);
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         do {
@@ -106,7 +106,7 @@ class TransactionController extends Controller
                 'status' => 'errors',
                 'message' => 'Failed updating a new transaction',
                 'errors' => $validator->errors()
-            ], Response::HTTP_NOT_ACCEPTABLE);
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
         
         try {
