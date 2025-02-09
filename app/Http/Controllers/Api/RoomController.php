@@ -6,6 +6,7 @@ use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Http\Controllers\Controller;
+use App\Models\RoomImage;
 use Illuminate\Support\Facades\Validator;
 
 class RoomController extends Controller
@@ -32,7 +33,9 @@ class RoomController extends Controller
         $validator = Validator::make(data: $request->all(), rules: [
             'room_number' => 'required|string|unique:rooms,room_number',
             'status' => 'required|string|in:available,occupied',
-            'price' => 'required|string'
+            'price' => 'required|numeric',
+            'images' => 'required|array',
+            'images.*' => 'image|mimes:jpg,jpeg,png|max:2048'
         ]);
 
         if ($validator->fails()) {
@@ -44,7 +47,22 @@ class RoomController extends Controller
         }
 
         try {
-            $createdRoom = Room::create($validator->validated());            
+            $createdRoom = Room::create([
+                'room_number' => $request->input('room_number'),
+                'status' => $request->input('status'),
+                'price' => $request->input('price'),
+            ]);
+            
+            $images = $request->file('images');
+            foreach($images as $image) {
+                $imageName = $image->getClientOriginalName();
+                $image->move(public_path('images/rooms'), $imageName);
+
+                RoomImage::create([
+                    'room_id' => $createdRoom->id,
+                    'image' => 'images/rooms/' . $image
+                ]);
+            }
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'errors',
@@ -56,7 +74,6 @@ class RoomController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Room data created successfully.',
-            'data' => $createdRoom
         ], Response::HTTP_CREATED);
     }
 
@@ -65,7 +82,9 @@ class RoomController extends Controller
      */
     public function show(string $id)
     {
-        $room = Room::where('id', $id)->firstOrFail();
+        $room = Room::with('room_images')
+            ->where('id', $id)
+            ->firstOrFail();
 
         return response()->json([
             'status' => 'ok',
@@ -107,7 +126,6 @@ class RoomController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Room data updated successfully.',
-            'data' => $room->fresh()
         ], Response::HTTP_CREATED);
     }
 

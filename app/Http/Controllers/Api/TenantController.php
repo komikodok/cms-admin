@@ -44,7 +44,7 @@ class TenantController extends Controller
         }
 
         try {
-            $createdTenant = Tenant::create($validator->validated());            
+            Tenant::create($validator->validated());            
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'errors',
@@ -56,7 +56,6 @@ class TenantController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Tenant data created successfully.',
-            'data' => $createdTenant
         ], Response::HTTP_CREATED);
     }
 
@@ -65,7 +64,9 @@ class TenantController extends Controller
      */
     public function show(string $id)
     {
-        $tenant = Tenant::where('id', $id)->firstOrFail();
+        $tenant = Tenant::with(['transactions.payment', 'transactions.room'])
+            ->where('id', $id)
+            ->firstOrFail();
 
         return response()->json([
             'status' => 'ok',
@@ -107,7 +108,6 @@ class TenantController extends Controller
         return response()->json([
             'status' => 'ok',
             'message' => 'Tenant data updated successfully',
-            'data' => $tenant->fresh()
         ], Response::HTTP_OK);
     }
 

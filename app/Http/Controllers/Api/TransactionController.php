@@ -31,8 +31,8 @@ class TransactionController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'tenant_id' => 'required|integer',
-            'room_id' => 'required|integer',
+            'tenant_id' => 'required|integer|exists:tenants,id',
+            'room_id' => 'required|integer|exists:rooms,id',
             'start_date' => 'required|date_format:Y-m-d H:i:s|after_or_equal:today',
             'end_date' => 'required|date_format:Y-m-d H:i:s|after_or_equal:today',
             'status' => 'required|string|in:pending,confirmed,canceled',
@@ -51,7 +51,7 @@ class TransactionController extends Controller
         } while (Transaction::where('token', $token)->exists());
         
         try {
-            $createdTransaction = Transaction::create([
+            Transaction::create([
                 'tenant_id' => $request->tenant_id,
                 'room_id' => $request->room_id,
                 'start_date' => $request->start_date,
@@ -70,7 +70,6 @@ class TransactionController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Successfully creating a new transaction',
-            'data' => $createdTransaction
         ], Response::HTTP_CREATED);
     }
 
@@ -123,7 +122,6 @@ class TransactionController extends Controller
         return response()->json([
             'status' => 'ok',
             'message' => 'Successfully updating a new transaction',
-            'data' => $transaction->fresh()
         ], Response::HTTP_OK);
     }
 

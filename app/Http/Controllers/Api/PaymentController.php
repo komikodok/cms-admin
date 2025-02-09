@@ -32,7 +32,7 @@ class PaymentController extends Controller
         $validator = Validator::make($request->all(), [
             'transaction_id' => 'required|integer|exists:transactions,id',
             'payment_date' => 'required|date_format:Y-m-d H:i:s|after_or_equal:today',
-            'amount' => 'nullable|string',
+            'amount' => 'nullable|numeric',
             'status' => 'required|string|in:pending,success,failed',
             'payment_method' => 'required|string|in:transfer,cash'
         ]);
@@ -46,7 +46,7 @@ class PaymentController extends Controller
         }
 
         try {
-            $createdPayment = Payment::create($validator->validated());
+            Payment::create($validator->validated());
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'errors',
@@ -58,7 +58,6 @@ class PaymentController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Payment data recorded successfully',
-            'data' => $createdPayment
         ], Response::HTTP_CREATED);
     }
 
@@ -84,7 +83,7 @@ class PaymentController extends Controller
         $validator = Validator::make($request->all(), [
             'transaction_id' => 'required|integer|exists:transactions,id',
             'payment_date' => 'required|date_format:Y-m-d H:i:s|after_or_equal:today',
-            'amount' => 'nullable|string',
+            'amount' => 'nullable|numeric',
             'status' => 'required|string|in:pending,success,failed',
             'payment_method' => 'required|string|in:transfer,cash'
         ]);
@@ -111,7 +110,6 @@ class PaymentController extends Controller
         return response()->json([
             'status' => 'ok',
             'message' => 'Payment data updated successfully.',
-            'data' => $payment->fresh()
         ], Response::HTTP_OK);
     }
 
