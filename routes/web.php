@@ -8,3 +8,4 @@ Route::get('/', function () {
 });
 
 Route::patch('transactions/confirm/{id}', [ConfirmTransactionController::class, 'confirm']);
+// Route::patch('payment/is_paid/{id}', [ConfirmPaymentController::class, 'confirm']);

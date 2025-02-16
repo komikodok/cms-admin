@@ -3,24 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Transaction;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
 class ConfirmTransactionController extends Controller
 {
-    public function confirm(Request $request, string $id) {
-        $transaction = Transaction::with('payment')->where('id', $id)->first();
-
-        if (!$transaction) {
-            return response()->json([
-                'status' => 'errors',
-                'message' => 'Transaction data not found.'
-            ], Response::HTTP_NOT_FOUND);
-        }
+    public function confirm(string $id) {
+        $transaction = Transaction::with('payment')->where('id', $id)->firstOrFail();
 
         $payment = $transaction->payment;
-
         if (!$payment) {
             return response()->json([
                 'status' => 'errors',
@@ -29,19 +20,21 @@ class ConfirmTransactionController extends Controller
         }
 
         try {
-            DB::beginTransaction();
+            // DB::beginTransaction();
 
-            if ($payment->status === 'success') {
-                $transaction->update(['status' => 'confirmed']);
-            } else {
-                $transaction->update(['status' => 'canceled']);
-                $payment->update(['status' => 'failed']);
-            }
+            // $payment->status === 'success'
+            //     ? $transaction->update(['status' => 'confirmed']) 
+            //     : $transaction->update(['status' => 'canceled']);
 
-            DB::commit();
+            $transaction->update(['status' => 'confirmed']);
+            $payment->update(['status' => 'success']);
+
+            // DB::commit();
         } catch (\Exception $e) {
-            DB::rollBack();
+            // DB::rollBack();
 
+            $transaction->update(['status' => 'canceled']);
+            $payment->update(['status' => 'failed']);
             return response()->json([
                 'status' => 'errors',
                 'message' => 'Failed to update transaction status.',
