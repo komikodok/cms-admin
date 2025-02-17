@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use Illuminate\Support\Facades\Log;
 use App\Models\Room;
+use App\Models\RoomImage;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Http\Controllers\Controller;
-use App\Models\RoomImage;
 use Illuminate\Support\Facades\Validator;
 
 class RoomController extends Controller
@@ -39,6 +40,7 @@ class RoomController extends Controller
         ]);
 
         if ($validator->fails()) {
+            Log::info("error: " . $validator->errors());
             return response()->json([
                 'status' => 'errors',
                 'message' => 'Validation errors.',
@@ -64,6 +66,7 @@ class RoomController extends Controller
                 ]);
             }
         } catch (\Exception $e) {
+            Log::info("error: ". $e);
             return response()->json([
                 'status' => 'errors',
                 'message' => 'Failed to create room data.',

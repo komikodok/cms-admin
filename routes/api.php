@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\RoomController;
-use App\Http\Controllers\Api\RoomImageController;
 use App\Http\Controllers\Api\TenantController;
 use App\Http\Controllers\Api\TransactionController;
 use Illuminate\Support\Facades\Route;

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('room_number');
             $table->enum('status', ['available', 'occupied'])->default('available');
-            $table->decimal('price', 10, 2)->default(0)->change(); 
+            $table->decimal('price', 10, 2)->default(0); 
             $table->timestamps();
         });
     }

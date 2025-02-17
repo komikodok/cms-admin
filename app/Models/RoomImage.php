@@ -10,7 +10,7 @@ class RoomImage extends Model
 {
     use HasFactory;
 
-    protected $guard = [];
+    protected $fillable = ['room_id', 'image'];
 
     public function room(): BelongsTo
     {
